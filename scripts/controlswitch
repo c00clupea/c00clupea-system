@@ -1,0 +1,20 @@
+#!/bin/bash
+
+start_switch(){
+    sudo ovs-vsctl add-br intrabridge
+    
+}
+
+stop_switch(){
+    sudo ovs-vsctl del-br intrabridge
+}
+
+case "$1" in
+    start)
+	start_switch
+	;;
+    stop)
+	stop_switch
+	;;
+esac
+exit

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+BASE=`pwd $`
+IMAGES_DIR=${BASE}/../images
+
+start_network(){
+    echo "Start Network"
+    sh controlswitch start
+
+}
+
+stop_network(){
+    echo "Stop Network"
+    sh controlswitch stop
+}
+
+start_cloud(){
+    echo "Start Cloud"
+    echo "Start Firewall"
+    cd ${IMAGES_DIR}/firewall
+    pwd
+    sh controlfirewall start-vm
+    cd ${BASE}    
+}
+
+stop_cloud(){
+    echo "Stop Cloud"
+    cd ${IMAGES_DIR}/firewall
+    sh controlfirewall stop-vm
+    cd ${BASE}
+}
+
+
+
+case "$1" in
+    start)
+	start_network
+	start_cloud
+	;;
+    stop)
+	stop_cloud
+	stop_network
+	;;
+esac
+exit
