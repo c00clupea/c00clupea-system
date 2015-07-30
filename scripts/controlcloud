@@ -2,8 +2,8 @@
 
 BASE=`pwd $`
 RUN_DIR=${BASE}/../run
-IMAGES_DIR={BASE}/../images
-
+IMAGES_DIR=${BASE}/../images
+SNAP_DIR=${BASE}/../snapshot
 
 bootstrap_environment(){
     echo "Bootstrapping"
@@ -14,6 +14,7 @@ bootstrap_environment(){
     fi
     mkdir ${RUN_DIR}
     sudo mount -t ramfs -o 2048m ramfs ${RUN_DIR}
+    sudo chown -R  c00clupea ${RUN_DIR}
     mkdir -p ${RUN_DIR}/firewall
     mkdir -p ${RUN_DIR}/firewall/run
     mkdir -p ${RUN_DIR}/controller
@@ -23,19 +24,19 @@ bootstrap_environment(){
     cp ${IMAGES_DIR}/firewall.img ${RUN_DIR}/firewall/
     cp ${IMAGES_DIR}/controller.img ${RUN_DIR}/controller/
     cp ${IMAGES_DIR}/firewall.conf ${RUN_DIR}/firewall/config
-    cp ${IMAGES_DIR}/controller.conf ${RUN_DIR}/firewall/config
+    cp ${IMAGES_DIR}/controller.conf ${RUN_DIR}/controller/config
     cp ${IMAGES_DIR}/firewall_network.conf ${RUN_DIR}/firewall/controlnetwork
     cp ${IMAGES_DIR}/controller_network.conf ${RUN_DIR}/controller/controlnetwork
 }
 
 debootstrap_environment(){
     echo "debootstrap"
-    if [ ! -d ${RUN_DIR}]
+    if [ ! -d ${RUN_DIR} ]
     then
 	echo "Nothing to debootstrap"
     fi
     rm -rf ${RUN_DIR}/*
-    umount ${RUN_DIR}
+    sudo umount ${RUN_DIR}
     rm -rf ${RUN_DIR}
     }
 
@@ -71,18 +72,33 @@ stop_cloud(){
 
 snap_cloud(){
     echo "Doing some snapshot"
-    stop_cloud     
-    }
+    cp ${RUN_DIR}/firewall/firewall.img ${SNAP_DIR}/firewall.img     
+    cp ${RUN_DIR}/controller/controller.img ${SNAP_DIR}/controller.img
+}
 
 
 case "$1" in
     start)
+	bootstrap_environment
 	start_network
 	start_cloud
 	;;
     stop)
 	stop_cloud
 	stop_network
+	debootstrap_environment
+	;;
+    snapstop)
+	stop_cloud
+	stop_network
+	snap_cloud
+	debootstrap_environment
+	;;
+    bootstrap)
+	bootstrap_environment
+	;;
+    debootstrap)
+	debootstrap_environment
 	;;
 esac
 exit

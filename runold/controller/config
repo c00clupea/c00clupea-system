@@ -1,9 +1,0 @@
-C_HDA_FILE="controller.img"
-C_MEMORY=512
-C_TAPIF="tapcontroller"
-C_CPU="host"
-C_MAC=00:16:3e:03:00:01
-C_VNCPORT=5902
-C_VNC_DISPLAY=2
-C_KEY="de"
-C_ADD=""
