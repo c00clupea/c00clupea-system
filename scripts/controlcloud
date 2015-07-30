@@ -5,6 +5,16 @@ RUN_DIR=${BASE}/../run
 IMAGES_DIR=${BASE}/../images
 SNAP_DIR=${BASE}/../snapshot
 
+status(){
+    if [ -d ${RUN_DIR} ]
+    then
+	echo "System is running"
+    else
+	echo "System is down"
+    fi
+    
+    }
+
 bootstrap_environment(){
     echo "Bootstrapping"
     if [ -d ${RUN_DIR} ]
@@ -78,6 +88,10 @@ snap_cloud(){
 
 
 case "$1" in
+    status)
+	status
+	exit
+	;;
     start)
 	bootstrap_environment
 	start_network
