@@ -1,2 +1,5 @@
-images/firewall/firewall.img
+images/firewall.img
+images/controller.img
 iso/*
+backup/*
+run/*

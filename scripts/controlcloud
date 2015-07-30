@@ -1,7 +1,43 @@
 #!/bin/bash
 
 BASE=`pwd $`
-IMAGES_DIR=${BASE}/../images
+RUN_DIR=${BASE}/../run
+IMAGES_DIR={BASE}/../images
+
+
+bootstrap_environment(){
+    echo "Bootstrapping"
+    if [ -d ${RUN_DIR} ]
+    then
+	echo "Run already exists...stop"
+	exit 1
+    fi
+    mkdir ${RUN_DIR}
+    sudo mount -t ramfs -o 2048m ramfs ${RUN_DIR}
+    mkdir -p ${RUN_DIR}/firewall
+    mkdir -p ${RUN_DIR}/firewall/run
+    mkdir -p ${RUN_DIR}/controller
+    mkdir -p ${RUN_DIR}/controller/run
+    cp controlvm ${RUN_DIR}/firewall/
+    cp controlvm ${RUN_DIR}/controller/
+    cp ${IMAGES_DIR}/firewall.img ${RUN_DIR}/firewall/
+    cp ${IMAGES_DIR}/controller.img ${RUN_DIR}/controller/
+    cp ${IMAGES_DIR}/firewall.conf ${RUN_DIR}/firewall/config
+    cp ${IMAGES_DIR}/controller.conf ${RUN_DIR}/firewall/config
+    cp ${IMAGES_DIR}/firewall_network.conf ${RUN_DIR}/firewall/controlnetwork
+    cp ${IMAGES_DIR}/controller_network.conf ${RUN_DIR}/controller/controlnetwork
+}
+
+debootstrap_environment(){
+    echo "debootstrap"
+    if [ ! -d ${RUN_DIR}]
+    then
+	echo "Nothing to debootstrap"
+    fi
+    rm -rf ${RUN_DIR}/*
+    umount ${RUN_DIR}
+    rm -rf ${RUN_DIR}
+    }
 
 start_network(){
     echo "Start Network"
@@ -17,19 +53,26 @@ stop_network(){
 start_cloud(){
     echo "Start Cloud"
     echo "Start Firewall"
-    cd ${IMAGES_DIR}/firewall
-    pwd
+    cd ${RUN_DIR}/firewall
+    sh controlvm start-vm
+    cd ${RUN_DIR}/controller
     sh controlvm start-vm
     cd ${BASE}    
 }
 
 stop_cloud(){
     echo "Stop Cloud"
-    cd ${IMAGES_DIR}/firewall
+    cd ${RUN_DIR}/firewall
+    sh controlvm stop-vm
+    cd ${RUN_DIR}/controller
     sh controlvm stop-vm
     cd ${BASE}
 }
 
+snap_cloud(){
+    echo "Doing some snapshot"
+    stop_cloud     
+    }
 
 
 case "$1" in

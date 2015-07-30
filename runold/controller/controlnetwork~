@@ -1,0 +1,39 @@
+#!/bin/bash
+
+start_network(){
+	sudo ip link add name fwbridge type bridge
+	sudo ip link set dev fwbridge up
+	sudo ip link set dev eth3 promisc on
+	sudo ip link set dev eth3 up
+	sudo ip link set dev eth3 master fwbridge
+	sudo tunctl -u c00clupea -t tapfirewall
+	sudo ifconfig tapfirewall 0.0.0.0 promisc up
+	sudo ip link set dev tapfirewall master fwbridge
+	sudo tunctl -u c00clupea -t tapfwintranet
+	sudo ifconfig tapfwintranet 0.0.0.0 promisc up
+	sudo ovs-vsctl add-port intrabridge tapfwintranet
+	echo "Network started"
+}
+
+stop_network(){
+	sudo ip link set eth3 promisc off
+	sudo ip link set eth3 down
+	sudo ip link set dev eth3 nomaster
+	sudo tunctl -d tapfirewall
+	sudo ovs-vsctl del-port intrabridge tapfwintranet
+	sudo tunctl -d tapfwintranet
+	sudo ip link delete fwbridge type bridge
+	
+	echo "Network stopped"
+}
+
+case "$1" in
+     start)
+	start_network
+	;;
+     stop)
+	stop_network
+	;;
+esac
+exit	
+	
