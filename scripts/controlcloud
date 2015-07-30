@@ -114,5 +114,11 @@ case "$1" in
     debootstrap)
 	debootstrap_environment
 	;;
+    *)
+	echo "status"
+	echo "start"
+	echo "stop"
+	echo "snapstop"
+	;;
 esac
 exit
