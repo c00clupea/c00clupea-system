@@ -12,7 +12,7 @@ then
     exit 1
 fi
 
-. ${CLOUD_CONF}
+. ${CLOUD_CONFIG}
 
 status(){
     if [ -d ${RUN_DIR} ]
