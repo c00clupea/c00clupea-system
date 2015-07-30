@@ -74,7 +74,11 @@ stop_vm(){
 	echo "I stopped VM..."
     fi
     sh controlnetwork stop    
-    }
+}
+
+get_vnc_adress(){
+    echo "${C_NAME}: localhost:${C_VNCPORT}"
+}
 
 kill_vm(){
     get_vm_pid_to "kill"
@@ -151,6 +155,12 @@ case "$1" in
 	;;
     kill-vm)
 	kill_vm
+	;;
+    status)
+	get_status
+	;;
+    vnc)
+	get_vnc_adress
 	;;
     *)
 	echo "start-vm"

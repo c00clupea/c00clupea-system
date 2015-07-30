@@ -4,16 +4,41 @@ BASE=`pwd $`
 RUN_DIR=${BASE}/../run
 IMAGES_DIR=${BASE}/../images
 SNAP_DIR=${BASE}/../snapshot
+CLOUD_CONFIG=${BASE}/cloudconfig
+
+if [ ! -f ${CLOUD_CONFIG} ]
+then
+    echo "no config"
+    exit 1
+fi
+
+. ${CLOUD_CONF}
 
 status(){
     if [ -d ${RUN_DIR} ]
     then
+	echo "Test Firewall"
+	cd ${RUN_DIR}/firewall
+	sh controlvm status
+	sh controlvm vnc
+	echo "Test Controller"
+	cd ${RUN_DIR}/controller	    
+	sh controlvm status	    
+	sh controlvm vnc
+	cd ${BASE}
+	    
 	echo "System is running"
     else
 	echo "System is down"
     fi
     
-    }
+}
+
+ssh_firewall(){
+ssh ${CL_SSH_USER}@${CL_SSH_IP}
+}
+
+
 
 bootstrap_environment(){
     echo "Bootstrapping"
